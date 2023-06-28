@@ -12,7 +12,7 @@ const pupOptions: PuppeteerLaunchOptions = {
     await doWinningShit(browser, i);
   }
 
-  // await browser.close();
+  await browser.close();
 })();
 
 async function getPollLink(browser: Browser) {
@@ -37,6 +37,7 @@ async function doWinningShit(browser: Browser, index: number) {
       const [input] = await pollOption.$$('.css-answer-input input');
 
       if (optionText?.includes('Audri Hrncharik')) {
+        await wait(Math.round(Math.random() * 15));
         await input.click();
       }
     })
@@ -48,18 +49,20 @@ async function doWinningShit(browser: Browser, index: number) {
   await wait(Math.round(Math.random() * 15));
   await voteButton.click();
 
-  // console.log('Vote Result:', pollPage.);
+  const pages = await browser.pages();
+  const url = await pages[index].evaluate(() => window.location.href);
+  console.log('Vote Result:', url);
 
-  await pollPage
-    .screenshot({ path: `result-${index}.png`, fullPage: true, fromSurface: true, captureBeyondViewport: true })
-    .then(() => {
-      index++;
-    });
+  await pollPage.screenshot({
+    path: `result-${index}.png`,
+    fullPage: true,
+    fromSurface: true,
+    captureBeyondViewport: true
+  });
 }
 
 async function openNewTab(browser: Browser, url: string) {
   const page = await browser.newPage();
-  // await page.setRequestInterception(true);
   await page.setExtraHTTPHeaders({
     'user-agent':
       'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36',
