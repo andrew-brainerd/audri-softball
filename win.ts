@@ -1,16 +1,23 @@
 import puppeteer, { Browser, ElementHandle, PuppeteerLaunchOptions } from 'puppeteer';
+import querystring from 'querystring';
 
 const pupOptions: PuppeteerLaunchOptions = {
   headless: false,
   defaultViewport: { width: 800, height: 1000 }
 };
 
+let voteCount = 0;
+let revoteCount = 0;
+
 (async () => {
   const browser = await puppeteer.launch(pupOptions);
 
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < 15; i++) {
+    await wait(10000);
     await doWinningShit(browser, i);
   }
+
+  console.log('Vote Results', { voteCount, revoteCount });
 
   await browser.close();
 })();
@@ -46,12 +53,21 @@ async function doWinningShit(browser: Browser, index: number) {
   const [voteButtonContainer] = await pollPage.$$('.css-votebutton-outer');
   const [voteButton] = await voteButtonContainer.$$('a');
 
-  await wait(Math.round(Math.random() * 15));
+  await wait(Math.round(Math.random() * 90 + 10));
   await voteButton.click();
 
   const pages = await browser.pages();
   const url = await pages[index].evaluate(() => window.location.href);
-  console.log('Vote Result:', url);
+  const query = url.split('?')[1];
+  const message = querystring.parse(query).msg;
+
+  if (message === 'voted') {
+    voteCount++;
+  } else if (message === 'revoted') {
+    revoteCount++;
+  } else {
+    console.warn('Weird message received', message);
+  }
 
   await pollPage.screenshot({
     path: `result-${index}.png`,
