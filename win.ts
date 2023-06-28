@@ -20,22 +20,61 @@ const pupOptions: PuppeteerLaunchOptions = {
   await browser.close();
 })();
 
-async function doWinningShit(browser: Browser) {
-  const athleteOfTheWeekUrl = 'https://www.mlive.com/highschoolsports/2023/06/vote-for-ultimate-flint-area-spring-sports-athlete-of-the-week-for-2023.html?outputType=amp';
+async function getPollLink(browser: Browser) {
+  const athleteOfTheWeekUrl =
+    'https://www.mlive.com/highschoolsports/2023/06/vote-for-ultimate-flint-area-spring-sports-athlete-of-the-week-for-2023.html?outputType=amp';
   const athleteOfTheWeekPage = await openNewTab(browser, athleteOfTheWeekUrl);
   const [pollLink] = await athleteOfTheWeekPage.$x("//p[contains(., 'not seeing the poll below')]");
   const href = await pollLink.$eval('a', link => link.getAttribute('href'));
-  // const productsList = await athleteOfTheWeekPage.$$('#mainContent ul[data-test-id="productResults"] li article');
 
   console.log('Poll Link:', href);
+}
 
-  // await Promise.all(productsList.map(async product => {
-  //   const href = await product.$eval('a', link => link.getAttribute('href'));
-  //   console.log('Link:', href);
-  //   const quickFacts = await getQuickFacts(browser, `${baseUrl}${href}`);
+async function doWinningShit(browser: Browser) {
+  const pollUrl = 'https://poll.fm/12449654';
+  const pollPage = await openNewTab(browser, pollUrl);
+  // const pollOptions = await pollPage.$x("//div[contains(@class, 'css-answer-group')]");
 
-  //   console.log('Quick Facts', quickFacts);
-  // }));
+  const pollOptions = await pollPage.$$('.css-answer-row');
+
+  await Promise.all(
+    pollOptions.map(async pollOption => {
+      const optionText = await pollOption.evaluate(fi => fi.textContent?.trim());
+      // const [input] = await pollOption.$$('input');
+      const [input] = await pollOption.$$('.css-answer-input input');
+
+      if (optionText?.includes('Audri Hrncharik')) {
+        console.log('Best Athlete:', optionText);
+        console.log('Input', input);
+        
+
+        await input.click();
+        await pollOption.click();
+      }
+    })
+  );
+
+  // const [pollLink] = await pollPage.$x("//span[contains(., 'Audri Hrncharik')]");
+  // const href = await pollLink.$eval('a', link => link.getAttribute('href'));
+
+  // console.log('Poll Options', pollOptions);
+
+  // if (pollLink) {
+  //   const link = pollLink as ElementHandle<Element>;
+
+  //   console.log('Clicking link', link);
+
+  //   // link.$eval("")
+
+  //   link.hover();
+  //   link.focus();
+  //   link.click(); 
+  // } else {
+  //   console.log('Clicking nothing, fuck');
+  // }
+
+  await wait(5000);
+  // console.log("Winner Span:", pollLink);
 }
 
 async function openNewTab(browser: Browser, url: string) {
