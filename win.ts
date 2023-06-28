@@ -1,4 +1,4 @@
-import puppeteer, { Browser, ElementHandle, PuppeteerLaunchOptions } from 'puppeteer';
+import puppeteer, { Browser, PuppeteerLaunchOptions } from 'puppeteer';
 import querystring from 'querystring';
 
 const pupOptions: PuppeteerLaunchOptions = {
@@ -14,7 +14,7 @@ let revoteCount = 0;
 
   for (let i = 0; i < 15; i++) {
     await wait(10000);
-    await doWinningShit(browser, i);
+    await pickTheWinner(browser, i);
   }
 
   console.log('Vote Results', { voteCount, revoteCount });
@@ -22,17 +22,7 @@ let revoteCount = 0;
   await browser.close();
 })();
 
-async function getPollLink(browser: Browser) {
-  const athleteOfTheWeekUrl =
-    'https://www.mlive.com/highschoolsports/2023/06/vote-for-ultimate-flint-area-spring-sports-athlete-of-the-week-for-2023.html?outputType=amp';
-  const athleteOfTheWeekPage = await openNewTab(browser, athleteOfTheWeekUrl);
-  const [pollLink] = await athleteOfTheWeekPage.$x("//p[contains(., 'not seeing the poll below')]");
-  const href = await pollLink.$eval('a', link => link.getAttribute('href'));
-
-  console.log('Poll Link:', href);
-}
-
-async function doWinningShit(browser: Browser, index: number) {
+async function pickTheWinner(browser: Browser, index: number) {
   const pollUrl = 'https://poll.fm/12449654';
   const pollPage = await openNewTab(browser, pollUrl);
 
@@ -66,7 +56,7 @@ async function doWinningShit(browser: Browser, index: number) {
   } else if (message === 'revoted') {
     revoteCount++;
   } else {
-    console.warn('Weird message received', message);
+    console.warn('Unknown message received', message);
   }
 
   await pollPage.screenshot({
@@ -91,10 +81,6 @@ async function openNewTab(browser: Browser, url: string) {
   await page.waitForNetworkIdle();
 
   return page;
-}
-
-async function getClass(elementHandle: ElementHandle) {
-  return await (await elementHandle.getProperty('className')).jsonValue();
 }
 
 async function wait(time: number) {
