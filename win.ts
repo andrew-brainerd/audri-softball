@@ -11,6 +11,7 @@ const totalVoteCount = parseInt(process.env.VOTE_COUNT || '', 10) || 25;
 let voteCount = 0;
 let revoteCount = 0;
 let iterations = 0;
+let isFailing = false;
 
 (async () => {
   const browser = await puppeteer.launch(pupOptions);
@@ -66,11 +67,23 @@ async function pickTheWinner(browser: Browser, index: number) {
 
   if (message === 'voted') {
     voteCount++;
+
+    if (isFailing) {
+      isFailing = false;
+      console.timeEnd('Time Failing');
+    }
+
     console.log(`${iterations}) 🥎🥎🥎🥎🥎🥎🥎🥎🥎🥎🥎🥎🥎🥎🥎🥎🥎🥎🥎`);
   } else if (message === 'revoted') {
     console.log(`${iterations}) 💩💩💩💩💩💩💩💩💩💩💩💩💩💩💩💩💩💩💩`);
+
+    if (!isFailing) {
+      isFailing = true;
+      console.time('Time Failing');
+    }
+
     revoteCount++;
-    await wait(5000);
+    await wait(180000); // 3 minutes
   } else {
     console.log(`${iterations}) 🤔🤔🤔🤔🤔🤔🤔🤔🤔🤔🤔🤔🤔🤔🤔🤔🤔🤔🤔`);
   }
