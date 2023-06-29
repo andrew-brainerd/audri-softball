@@ -2,9 +2,11 @@ import puppeteer, { Browser, PuppeteerLaunchOptions } from 'puppeteer';
 import querystring from 'querystring';
 
 const pupOptions: PuppeteerLaunchOptions = {
-  headless: false,
+  headless: true,
   defaultViewport: { width: 800, height: 1000 }
 };
+
+const iterations = 15;
 
 let voteCount = 0;
 let revoteCount = 0;
@@ -12,12 +14,18 @@ let revoteCount = 0;
 (async () => {
   const browser = await puppeteer.launch(pupOptions);
 
-  for (let i = 0; i < 15; i++) {
-    await wait(10000);
+  console.time('Run Time');
+
+  for (let i = 0; i < iterations; i++) {
+    await wait(3000);
     await pickTheWinner(browser, i);
   }
 
-  console.log('Vote Results', { voteCount, revoteCount });
+  const successRate = voteCount > 0 ? Math.round(voteCount / iterations * 100) : 0;
+
+  console.log('Vote Results', { voteCount, revoteCount, successRate });
+
+  console.timeEnd('Run Time');
 
   await browser.close();
 })();
@@ -34,7 +42,7 @@ async function pickTheWinner(browser: Browser, index: number) {
       const [input] = await pollOption.$$('.css-answer-input input');
 
       if (optionText?.includes('Audri Hrncharik')) {
-        await wait(Math.round(Math.random() * 15));
+        await wait(Math.round(Math.random() * 20 + 10));
         await input.click();
       }
     })
@@ -53,10 +61,9 @@ async function pickTheWinner(browser: Browser, index: number) {
 
   if (message === 'voted') {
     voteCount++;
+    console.log('Vote Counted 🎉');
   } else if (message === 'revoted') {
     revoteCount++;
-  } else {
-    console.warn('Unknown message received', message);
   }
 
   await pollPage.screenshot({

@@ -7,7 +7,7 @@
   "main": "win.js",
   "scripts": {
     "build": "npx tsc && tsc-alias",
-    "dev": "rm result* -f && npm run build && npm run --silent build && npm run --silent start",
+    "dev": "rm result* -f && npm run --silent build && npm run --silent start",
     "start": "node dist/win.js",
     "test": "echo \"No tests here\" && exit 1",
     "make-pretty": "npx prettier --write --ignore-unknown ."
