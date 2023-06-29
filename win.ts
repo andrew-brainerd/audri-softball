@@ -2,7 +2,7 @@ import puppeteer, { Browser, PuppeteerLaunchOptions } from 'puppeteer';
 import querystring from 'querystring';
 
 const pupOptions: PuppeteerLaunchOptions = {
-  headless: false,
+  headless: true,
   defaultViewport: { width: 800, height: 1000 }
 };
 
