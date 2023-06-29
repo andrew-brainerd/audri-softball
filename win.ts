@@ -67,6 +67,7 @@ async function pickTheWinner(browser: Browser, index: number) {
   } else if (message === 'revoted') {
     console.log('Registered as revote 💩');
     revoteCount++;
+    await wait(15000);
   }
 }
 
