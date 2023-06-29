@@ -79,7 +79,6 @@ async function pickTheWinner(browser: Browser, index: number) {
     }
 
     revoteCount++;
-    await wait(180000); // 3 minutes
   } else {
     console.log(`${iterations}) 🤔🤔🤔🤔🤔🤔🤔🤔🤔🤔🤔🤔🤔🤔🤔🤔🤔🤔🤔`);
   }
