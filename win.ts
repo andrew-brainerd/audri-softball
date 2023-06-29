@@ -67,6 +67,7 @@ async function pickTheWinner(browser: Browser, index: number) {
   } else if (message === 'revoted') {
     console.log(`[${index + 1}/${iterations}] 💩`);
     revoteCount++;
+    await wait(60000);
   } else  {
     console.log(`[${index + 1}/${iterations}] 🤔`);
   }
