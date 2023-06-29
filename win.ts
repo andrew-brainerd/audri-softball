@@ -6,24 +6,27 @@ const pupOptions: PuppeteerLaunchOptions = {
   defaultViewport: { width: 800, height: 1000 }
 };
 
-const iterations = parseInt(process.env.NUM_ITERATIONS || '', 10) || 25;
+const totalVoteCount = parseInt(process.env.VOTE_COUNT || '', 10) || 25;
 
 let voteCount = 0;
 let revoteCount = 0;
+let iterations = 0;
 
 (async () => {
   const browser = await puppeteer.launch(pupOptions);
 
   console.time('Run Time');
 
-  for (let i = 0; i < iterations; i++) {
-    if (i !== 0) {
+  while (voteCount < totalVoteCount) {
+    if (voteCount !== 0) {
       await wait(parseInt(process.env.ITER_WAIT || '', 10) || 5000);
     }
-    await pickTheWinner(browser, i);
+    await pickTheWinner(browser, iterations);
+
+    iterations++;
   }
 
-  const successRate = voteCount > 0 ? Math.round(voteCount / iterations * 100) : 0;
+  const successRate = voteCount > 0 ? Math.round((voteCount / iterations) * 100) : 0;
 
   console.log('Vote Results', { voteCount, revoteCount, successRate });
 
@@ -63,13 +66,13 @@ async function pickTheWinner(browser: Browser, index: number) {
 
   if (message === 'voted') {
     voteCount++;
-    console.log(`[${index + 1}/${iterations}] 🥎🥎🥎🥎🥎🥎🥎🥎🥎🥎🥎🥎🥎🥎🥎🥎🥎🥎🥎`);
+    console.log(`${iterations}) 🥎🥎🥎🥎🥎🥎🥎🥎🥎🥎🥎🥎🥎🥎🥎🥎🥎🥎🥎`);
   } else if (message === 'revoted') {
-    console.log(`[${index + 1}/${iterations}] 💩💩💩💩💩💩💩💩💩💩💩💩💩💩💩💩💩💩💩`);
+    console.log(`${iterations}) 💩💩💩💩💩💩💩💩💩💩💩💩💩💩💩💩💩💩💩`);
     revoteCount++;
     await wait(5000);
-  } else  {
-    console.log(`[${index + 1}/${iterations}] 🤔🤔🤔🤔🤔🤔🤔🤔🤔🤔🤔🤔🤔🤔🤔🤔🤔🤔🤔`);
+  } else {
+    console.log(`${iterations}) 🤔🤔🤔🤔🤔🤔🤔🤔🤔🤔🤔🤔🤔🤔🤔🤔🤔🤔🤔`);
   }
 }
 
