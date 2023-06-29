@@ -44,7 +44,7 @@ async function pickTheWinner(browser: Browser, index: number) {
       const [input] = await pollOption.$$('.css-answer-input input');
 
       if (optionText?.includes('Audri Hrncharik')) {
-        await wait(Math.round(Math.random() * 60 + 15));
+        await wait(Math.round(Math.random() * 60 + 1500));
         await input.click();
       }
     })
@@ -53,7 +53,7 @@ async function pickTheWinner(browser: Browser, index: number) {
   const [voteButtonContainer] = await pollPage.$$('.css-votebutton-outer');
   const [voteButton] = await voteButtonContainer.$$('a');
 
-  await wait(Math.round(Math.random() * 60 + 15));
+  await wait(Math.round(Math.random() * 60 + 1500));
   await voteButton.click();
 
   const pages = await browser.pages();
