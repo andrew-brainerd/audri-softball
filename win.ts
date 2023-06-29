@@ -2,7 +2,7 @@ import puppeteer, { Browser, PuppeteerLaunchOptions } from 'puppeteer';
 import querystring from 'querystring';
 
 const pupOptions: PuppeteerLaunchOptions = {
-  headless: true,
+  headless: false,
   defaultViewport: { width: 800, height: 1000 }
 };
 
@@ -17,7 +17,9 @@ let revoteCount = 0;
   console.time('Run Time');
 
   for (let i = 0; i < iterations; i++) {
-    await wait(parseInt(process.env.ITER_WAIT || '', 10) || 5000);
+    if (i !== 0) {
+      await wait(parseInt(process.env.ITER_WAIT || '', 10) || 5000);
+    }
     await pickTheWinner(browser, i);
   }
 
@@ -42,7 +44,8 @@ async function pickTheWinner(browser: Browser, index: number) {
       const [input] = await pollOption.$$('.css-answer-input input');
 
       if (optionText?.includes('Audri Hrncharik')) {
-        await wait(Math.round(Math.random() * 20 + 10));
+        await wait(Math.round(Math.random() * 60 + 15));
+        await pollPage.mouse.move(Math.round(Math.random() * 60 + 250), Math.round(Math.random() * 60 + 250));
         await input.click();
       }
     })
@@ -51,7 +54,8 @@ async function pickTheWinner(browser: Browser, index: number) {
   const [voteButtonContainer] = await pollPage.$$('.css-votebutton-outer');
   const [voteButton] = await voteButtonContainer.$$('a');
 
-  await wait(Math.round(Math.random() * 20 + 10));
+  await wait(Math.round(Math.random() * 60 + 15));
+  await pollPage.mouse.move(Math.round(Math.random() * 60 + 250), Math.round(Math.random() * 60 + 250));
   await voteButton.click();
 
   const pages = await browser.pages();
