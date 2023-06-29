@@ -27,11 +27,7 @@ let isFailing = false;
     iterations++;
   }
 
-  const successRate = voteCount > 0 ? Math.round((voteCount / iterations) * 100) : 0;
-
-  console.log('Vote Results', { voteCount, revoteCount, successRate });
-
-  console.timeEnd('Run Time');
+  endExecution();
 
   await browser.close();
 })();
@@ -108,3 +104,17 @@ async function openNewTab(browser: Browser, url: string) {
 async function wait(time: number) {
   await new Promise(res => setTimeout(res, time));
 }
+
+function endExecution() {
+  const successRate = voteCount > 0 ? Math.round((voteCount / iterations) * 100) : 0;
+
+  console.log('Vote Results', { voteCount, revoteCount, successRate });
+
+  console.timeEnd('Run Time');
+}
+
+process.on('exit', endExecution);
+process.on('SIGINT', endExecution);
+process.on('SIGUSR1', endExecution);
+process.on('SIGUSR2', endExecution);
+process.on('uncaughtException', endExecution);
