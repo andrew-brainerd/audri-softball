@@ -45,7 +45,6 @@ async function pickTheWinner(browser: Browser, index: number) {
 
       if (optionText?.includes('Audri Hrncharik')) {
         await wait(Math.round(Math.random() * 60 + 15));
-        await pollPage.mouse.move(Math.round(Math.random() * 60 + 250), Math.round(Math.random() * 60 + 250));
         await input.click();
       }
     })
@@ -55,7 +54,6 @@ async function pickTheWinner(browser: Browser, index: number) {
   const [voteButton] = await voteButtonContainer.$$('a');
 
   await wait(Math.round(Math.random() * 60 + 15));
-  await pollPage.mouse.move(Math.round(Math.random() * 60 + 250), Math.round(Math.random() * 60 + 250));
   await voteButton.click();
 
   const pages = await browser.pages();
@@ -67,6 +65,7 @@ async function pickTheWinner(browser: Browser, index: number) {
     voteCount++;
     console.log('Vote Counted 🎉');
   } else if (message === 'revoted') {
+    console.log('Registered as revote 💩');
     revoteCount++;
   }
 }
