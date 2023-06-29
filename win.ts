@@ -12,6 +12,7 @@ let voteCount = 0;
 let revoteCount = 0;
 let iterations = 0;
 let isFailing = false;
+let progress = '';
 
 (async () => {
   const browser = await puppeteer.launch(pupOptions);
@@ -69,9 +70,9 @@ async function pickTheWinner(browser: Browser, index: number) {
       console.timeEnd('Time Failing');
     }
 
-    console.log(`${iterations}) 🥎🥎🥎🥎🥎🥎🥎🥎🥎🥎🥎🥎🥎🥎🥎🥎🥎🥎🥎`);
+    progress += '🥎';
   } else if (message === 'revoted') {
-    console.log(`${iterations}) 💩💩💩💩💩💩💩💩💩💩💩💩💩💩💩💩💩💩💩`);
+    progress += '💩';
 
     if (!isFailing) {
       isFailing = true;
@@ -80,8 +81,11 @@ async function pickTheWinner(browser: Browser, index: number) {
 
     revoteCount++;
   } else {
-    console.log(`${iterations}) 🤔🤔🤔🤔🤔🤔🤔🤔🤔🤔🤔🤔🤔🤔🤔🤔🤔🤔🤔`);
+    progress += '🤔';
   }
+
+  process.stdout.write('\x1bc');
+  console.log(`${progress}\n\n${voteCount} votes submitted\n\n`);
 }
 
 async function openNewTab(browser: Browser, url: string) {
