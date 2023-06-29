@@ -11,7 +11,6 @@ const totalVoteCount = parseInt(process.env.VOTE_COUNT || '', 10) || 25;
 let voteCount = 0;
 let revoteCount = 0;
 let iterations = 0;
-let isFailing = false;
 let progress = '';
 
 (async () => {
@@ -58,34 +57,40 @@ async function pickTheWinner(browser: Browser, index: number) {
   await voteButton.click();
 
   const pages = await browser.pages();
-  const url = await pages[index].evaluate(() => window.location.href);
+  const resultsPage = pages[index];
+  const url = await resultsPage.evaluate(() => window.location.href);
   const query = url.split('?')[1];
   const message = querystring.parse(query).msg;
 
+  const feedbackLabels = await resultsPage.$$('.pds-feedback-label');
+
   if (message === 'voted') {
-    voteCount++;
-
-    if (isFailing) {
-      isFailing = false;
-      console.timeEnd('Time Failing');
-    }
-
     progress += '🥎';
+    voteCount++;
   } else if (message === 'revoted') {
     progress += '💩';
-
-    if (!isFailing) {
-      isFailing = true;
-      console.time('Time Failing');
-    }
-
     revoteCount++;
   } else {
     progress += '🤔';
   }
 
   process.stdout.write('\x1bc');
-  console.log(`${progress}\n\n${voteCount} votes submitted\n\n`);
+
+  console.log(`\n${progress}\n\n${voteCount} votes submitted\n`);
+
+  await Promise.all(
+    feedbackLabels.map(async (result, r) => {
+      const athleteInfo = await result.$eval('.pds-answer-text', span => span.textContent?.trim());
+      const percentage = await result.$eval('.pds-feedback-per', span => span.textContent?.trim());
+
+      const ranking = `${r + 1}:`;
+      const athlete = athleteInfo?.split(', ')[0];
+
+      console.log(`#${ranking.padEnd(3)} ${athlete?.padEnd(25)} ${percentage}`);
+    })
+  );
+
+  console.log('\n');
 }
 
 async function openNewTab(browser: Browser, url: string) {
@@ -111,9 +116,9 @@ async function wait(time: number) {
 function endExecution() {
   const successRate = voteCount > 0 ? Math.round((voteCount / iterations) * 100) : 0;
 
-  console.log('Vote Results', { voteCount, revoteCount, successRate });
+  console.log('\n\nVote Results', { voteCount, revoteCount, successRate });
 
-  console.timeEnd('Run Time');
+  console.timeEnd('\nRun Time');
 }
 
 process.on('exit', endExecution);
