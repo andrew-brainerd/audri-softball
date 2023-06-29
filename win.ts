@@ -6,7 +6,7 @@ const pupOptions: PuppeteerLaunchOptions = {
   defaultViewport: { width: 800, height: 1000 }
 };
 
-const iterations = 15;
+const iterations = parseInt(process.env.NUM_ITERATIONS || '', 10) || 25;
 
 let voteCount = 0;
 let revoteCount = 0;
@@ -17,7 +17,7 @@ let revoteCount = 0;
   console.time('Run Time');
 
   for (let i = 0; i < iterations; i++) {
-    await wait(3000);
+    await wait(parseInt(process.env.ITER_WAIT || '', 10) || 5000);
     await pickTheWinner(browser, i);
   }
 
@@ -51,7 +51,7 @@ async function pickTheWinner(browser: Browser, index: number) {
   const [voteButtonContainer] = await pollPage.$$('.css-votebutton-outer');
   const [voteButton] = await voteButtonContainer.$$('a');
 
-  await wait(Math.round(Math.random() * 90 + 10));
+  await wait(Math.round(Math.random() * 20 + 10));
   await voteButton.click();
 
   const pages = await browser.pages();
@@ -65,13 +65,6 @@ async function pickTheWinner(browser: Browser, index: number) {
   } else if (message === 'revoted') {
     revoteCount++;
   }
-
-  await pollPage.screenshot({
-    path: `result-${index}.png`,
-    fullPage: true,
-    fromSurface: true,
-    captureBeyondViewport: true
-  });
 }
 
 async function openNewTab(browser: Browser, url: string) {
