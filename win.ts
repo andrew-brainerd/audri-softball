@@ -118,7 +118,7 @@ function endExecution() {
 
   console.log('\n\nVote Results', { voteCount, revoteCount, successRate });
 
-  console.timeEnd('\nRun Time');
+  console.timeEnd('Run Time');
 }
 
 process.on('exit', endExecution);
